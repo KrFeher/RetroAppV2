@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from "react";
+import "semantic-ui-css/semantic.min.css";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import Retro from "./Retro";
+import Admin from './Admin';
+import LoginPage from "./LoginPage";
 
 function App() {
+  const [authenticated, setAuthenticated] = useState(true);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <LoginPage error={false}/>
+          </Route>
+          <Route path="/retro">
+            <Retro />
+          </Route>
+          <Route path="/admin">
+            {(authenticated ? <Admin /> : <LoginPage error={true}/>)}
+          </Route>
+        </Switch>
+      </Router>
     </div>
   );
 }
