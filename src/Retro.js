@@ -4,29 +4,37 @@ import {
   Container,
   Divider,
   Grid,
-  Input,
+  Transition,
   Button,
-  List,
   Icon,
 } from "semantic-ui-react";
+import OpinionStep from "./OpinionStep";
+import VoteStep from "./VoteStep";
+import SummaryStep from "./SummaryStep";
 
 const Retro = () => {
-  const [opinions, setOpinions] = useState([
-    { description: "Potato", isPositive: true },
-    { description: "Cheese is very nice too", isPositive: false },
-  ]);
-  const [currentIsPositive, setCurrentIsPositive] = useState("default");
+  const [opinionStepVisibility, setOpinionStepVisibility] = useState(true);
+  const [voteStepVisibility, setVoteStepVisibility] = useState(false);
+  const [summaryStepVisibility, setSummaryStepVisibility] = useState(false);
+  const [activeBreadCrumb, setActiveBreadCrumb] = useState(1);
 
-  const onCurrentIconClick = () => {
-    switch (currentIsPositive) {
-      case "default":
-        setCurrentIsPositive(true);
+  const onNextStepClick = (stepNumber) => {
+    switch (stepNumber) {
+      case 1:
+        setOpinionStepVisibility(false);
+        setActiveBreadCrumb(2);
+        setTimeout(function () {
+          setVoteStepVisibility(true);
+        }, 500); // delay needed so sections don't load on top of each other due to transition
         break;
-      case true:
-        setCurrentIsPositive(false);
-        break;
-      case false:
-        setCurrentIsPositive(true);
+      case 2:
+        {
+          setVoteStepVisibility(false);
+          setActiveBreadCrumb(3);
+          setTimeout(function () {
+            setSummaryStepVisibility(true);
+          }, 500); // delay needed so sections don't load on top of each other due to transition
+        }
         break;
       default:
         break;
@@ -45,83 +53,33 @@ const Retro = () => {
       <Grid>
         <Grid.Column textAlign="center">
           <Breadcrumb>
-            <Breadcrumb.Section active>Add opinion</Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 1}>
+              Add opinion
+            </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right arrow" />
-            <Breadcrumb.Section>Vote for others</Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 2}>
+              Vote for others
+            </Breadcrumb.Section>
             <Breadcrumb.Divider icon="right arrow" />
-            <Breadcrumb.Section>See summary</Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 3}>
+              See summary
+            </Breadcrumb.Section>
           </Breadcrumb>
           <Divider />
         </Grid.Column>
       </Grid>
-      <Grid>
-        <Grid.Column>
-          <Grid.Row style={{ paddingBottom: "10px" }}>
-            <Input label="Write an opinion : "></Input>
-            {currentIsPositive === "default" ? (
-              <Button
-                circular
-                size="tiny"
-                style={{ marginLeft: "10px" }}
-                onClick={onCurrentIconClick}
-              >
-                Choose
-              </Button>
-            ) : currentIsPositive ? (
-              <Button
-                circular
-                icon="plus"
-                size="tiny"
-                style={{ marginLeft: "10px" }}
-                color="green"
-                onClick={onCurrentIconClick}
-              ></Button>
-            ) : (
-              <Button
-                circular
-                icon="minus"
-                size="tiny"
-                style={{ marginLeft: "10px" }}
-                color="red"
-                onClick={onCurrentIconClick}
-              ></Button>
-            )}
-          </Grid.Row>
-          <Grid.Row>
-            <Button size="tiny" color="olive">
-              Add opinion
-            </Button>
-          </Grid.Row>
-        </Grid.Column>
-      </Grid>
-      <Divider />
-      <List>
-        {opinions.map((opinion) => {
-          return (
-            <List.Item verticalAlign="middle" style={{ padding: "5px" }}>
-              <List.Content floated="left">
-                <List.Description>
-                  {opinion.isPositive ? (
-                    <Icon name="plus" color="green" />
-                  ) : (
-                    <Icon name="minus" color="red" />
-                  )}
-                  {opinion.description}
-                </List.Description>
-              </List.Content>
-              <List.Content floated="right">
-                <Button size="mini" icon="trash" circular></Button>
-              </List.Content>
-            </List.Item>
-          );
-        })}
-      </List>
-      <Container textAlign="right" style={{ paddingTop: "30px" }}>
-        <Button icon labelPosition="right">
-          Next step: Vote
-          <Icon name="right arrow" />
-        </Button>
-      </Container>
+      tomorrow: fix transitions or remove them.
+      <Transition.Group transitionOnMount duration={{ hide: 500, show: 500 }} animation='fade'>
+        {opinionStepVisibility && (
+          <OpinionStep finishedAddingAction={onNextStepClick} />
+        )}
+        {voteStepVisibility && (
+          <VoteStep finishedAddingAction={onNextStepClick}></VoteStep>
+        )}
+        {summaryStepVisibility && (
+          <SummaryStep></SummaryStep>
+        )}
+      </Transition.Group>
     </Container>
   );
 };
