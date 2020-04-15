@@ -23,18 +23,12 @@ const Retro = () => {
       case 1:
         setOpinionStepVisibility(false);
         setActiveBreadCrumb(2);
-        setTimeout(function () {
-          setVoteStepVisibility(true);
-        }, 500); // delay needed so sections don't load on top of each other due to transition
+        setVoteStepVisibility(true);
         break;
       case 2:
-        {
-          setVoteStepVisibility(false);
-          setActiveBreadCrumb(3);
-          setTimeout(function () {
-            setSummaryStepVisibility(true);
-          }, 500); // delay needed so sections don't load on top of each other due to transition
-        }
+        setVoteStepVisibility(false);
+        setActiveBreadCrumb(3);
+        setSummaryStepVisibility(true);
         break;
       default:
         break;
@@ -68,18 +62,13 @@ const Retro = () => {
           <Divider />
         </Grid.Column>
       </Grid>
-      tomorrow: fix transitions or remove them.
-      <Transition.Group transitionOnMount duration={{ hide: 500, show: 500 }} animation='fade'>
-        {opinionStepVisibility && (
-          <OpinionStep finishedAddingAction={onNextStepClick} />
-        )}
-        {voteStepVisibility && (
-          <VoteStep finishedAddingAction={onNextStepClick}></VoteStep>
-        )}
-        {summaryStepVisibility && (
-          <SummaryStep></SummaryStep>
-        )}
-      </Transition.Group>
+      {opinionStepVisibility && (
+        <OpinionStep finishedAddingAction={onNextStepClick} />
+      )}
+      {voteStepVisibility && (
+        <VoteStep finishedAddingAction={onNextStepClick}></VoteStep>
+      )}
+      {summaryStepVisibility && <SummaryStep></SummaryStep>}
     </Container>
   );
 };

@@ -62,12 +62,21 @@ const OpinionStep = (props) => {
     setOpinions([...newArray]);
   };
 
+  const saveOpinions = () => {
+    // check if anything is filled in at all, if not show warning message but proceed.
+    // if pressed ok or there's at least 1 item then 
+    // remove the 2 example up top
+    // .....
+    // call back-end to save data
+  }
+
   const onOpinionInputChange = (event) => {
     setNewOpinion(event.target.value);
   };
 
   const onNextStepClick = () => {
     props.finishedAddingAction(1);
+    saveOpinions();
   };
 
   return (
