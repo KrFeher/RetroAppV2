@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import {
   Container,
@@ -8,11 +8,17 @@ import {
   Button,
   List,
   Icon,
+  Message,
 } from "semantic-ui-react";
+import api from "./api";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 const OpinionStep = (props) => {
   // States
   const exampleUuids = [uuid(), uuid()];
+  let location = useLocation();
+  const retroId = queryString.parse(location.search);
 
   const [opinions, setOpinions] = useState([
     {
@@ -28,6 +34,16 @@ const OpinionStep = (props) => {
   ]);
   const [currentIsPositive, setCurrentIsPositive] = useState("default");
   const [newOpinion, setNewOpinion] = useState("");
+  const [currentRetro, setCurrentRetro] = useState("");
+  const [showError, setShowError] = useState(false)
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await api.getRetro(retroId.id);
+      setCurrentRetro(response);
+    }
+    fetchData();
+  }, []);
 
   // Functions
   const onCurrentIconClick = () => {
@@ -47,7 +63,7 @@ const OpinionStep = (props) => {
   };
 
   const addOpinion = () => {
-    if (currentIsPositive !== "default") {
+    if (currentIsPositive !== "default" && newOpinion) {
       setOpinions([
         ...opinions,
         { id: uuid(), description: newOpinion, isPositive: currentIsPositive },
@@ -62,26 +78,37 @@ const OpinionStep = (props) => {
     setOpinions([...newArray]);
   };
 
-  const saveOpinions = () => {
+  const saveOpinions = async () => {
+    return await api.submitRetroOpinions(retroId.id, opinions);
     // check if anything is filled in at all, if not show warning message but proceed.
-    // if pressed ok or there's at least 1 item then 
+    // if pressed ok or there's at least 1 item then
     // remove the 2 example up top
     // .....
     // call back-end to save data
-  }
+  };
 
   const onOpinionInputChange = (event) => {
     setNewOpinion(event.target.value);
   };
 
-  const onNextStepClick = () => {
-    props.finishedAddingAction(1);
-    saveOpinions();
+  const onNextStepClick = async () => {
+    const isSuccess = await saveOpinions();
+    if (isSuccess) {
+      props.finishedAddingAction(1);
+    } else {
+      setShowError(true);
+    }
   };
 
   return (
-    <React.Fragment>
+    <div>
       <Container>
+      <Message
+          error
+          content="Something went wrong server side. Please try again."
+          size="tiny"
+          hidden={!showError}
+        />
         <Grid>
           <Grid.Column>
             <Grid.Row style={{ paddingBottom: "10px" }}>
@@ -89,6 +116,9 @@ const OpinionStep = (props) => {
                 label="Write an opinion : "
                 onChange={onOpinionInputChange}
               ></Input>
+            </Grid.Row>
+            <Grid.Row style={{ paddingBottom: "10px" }}>
+              {"Choose intention: "}
               {currentIsPositive === "default" ? (
                 <Button
                   circular
@@ -133,11 +163,7 @@ const OpinionStep = (props) => {
         <List>
           {opinions.map((opinion) => {
             return (
-              <List.Item
-                verticalAlign="middle"
-                style={{ padding: "5px" }}
-                key={opinion.id}
-              >
+              <List.Item style={{ padding: "5px" }} key={opinion.id}>
                 <List.Content floated="left">
                   <List.Description>
                     {opinion.isPositive ? (
@@ -167,7 +193,7 @@ const OpinionStep = (props) => {
           <Icon name="right arrow" />
         </Button>
       </Container>
-    </React.Fragment>
+    </div>
   );
 };
 

@@ -18,8 +18,8 @@ const Admin = () => {
       <h2>Open retros</h2>
       <List>
         <List.Item>
-          <List.Content floated="left">Retro name</List.Content>
-          <List.Content floated="right">
+          <List.Header style={{ padding: "5px" }}>Retro name</List.Header>
+          <List.Content>
             <Button size="tiny">
               Go to Retro
             </Button>
@@ -32,9 +32,9 @@ const Admin = () => {
           </List.Content>
         </List.Item>
         <List.Item>
-          <List.Content floated="left">Potato</List.Content>
-          <List.Content floated="right">
-          <Button size="tiny">
+          <List.Header style={{ padding: "5px" }}>Potato</List.Header>
+          <List.Content>
+            <Button size="tiny">
               Go to Retro
             </Button>
             <Button size="tiny">

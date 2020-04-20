@@ -92,13 +92,12 @@ export const VoteStep = (props) => {
   };
 
   return (
-    <React.Fragment>
+    <div>
       <Container>
         <List>
           {Object.entries(opinionsWithVotes).map((opinion) => {
             return (
               <List.Item
-                verticalAlign="middle"
                 style={{ padding: "5px" }}
                 key={opinion[0]}
               >
@@ -134,7 +133,7 @@ export const VoteStep = (props) => {
           <Icon name="right arrow" />
         </Button>
       </Container>
-    </React.Fragment>
+    </div>
   );
 };
 

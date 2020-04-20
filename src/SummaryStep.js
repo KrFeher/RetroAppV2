@@ -77,13 +77,12 @@ const SummaryStep = (props) => {
   }, []);
 
   return (
-    <React.Fragment>
+    <div>
       <Container>
         <List>
           {sortedGoodOpinions.map((opinion) => {
             return (
               <List.Item
-                verticalAlign="middle"
                 style={{ padding: "5px" }}
                 key={opinion.id}
               >
@@ -109,7 +108,6 @@ const SummaryStep = (props) => {
           {sortedBadOpinions.map((opinion) => {
             return (
               <List.Item
-                verticalAlign="middle"
                 style={{ padding: "5px" }}
                 key={opinion.id}
               >
@@ -131,7 +129,7 @@ const SummaryStep = (props) => {
           })}
         </List>
       </Container>
-    </React.Fragment>
+    </div>
   );
 };
 

@@ -1,56 +1,77 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Grid, Header, List, Message } from "semantic-ui-react";
+import {
+  Container,
+  Button,
+  Grid,
+  List,
+  Message,
+  Divider,
+} from "semantic-ui-react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { useHistory } from "react-router-dom";
+import api from "./api";
 
 function LoginPage(props) {
   let history = useHistory();
+  const [retros, setRetros] = useState([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await api.getRetros();
+      setRetros(response);
+    }
+    fetchData();
+  }, []);
 
   return (
-    <Modal size="tiny" defaultOpen closeOnDimmerClick={false}>
-      <Modal.Header>
-        <Grid>
-          <Grid.Column floated="left" width={8}>
-            Retro app
-          </Grid.Column>
-          <Grid.Column floated="right" width={8} textAlign="right">
-            <Button onClick={() => history.push("/admin")}>
-              Retro lead login
-            </Button>
-          </Grid.Column>
-        </Grid>
-      </Modal.Header>
-      <Modal.Content>
+    <Container
+      style={{
+        width: "500px",
+        border: "1px solid",
+        margin: "15px",
+        padding: "15px",
+      }}
+    >
+      <Grid>
+        <Grid.Column floated="left" width={8}>
+          <h1> Retro app</h1>
+          <Divider />
+        </Grid.Column>
+        <Grid.Column floated="right" width={8} textAlign="right">
+          <Button onClick={() => history.push("/admin")}>
+            Retro lead login
+          </Button>
+        </Grid.Column>
+      </Grid>
+      <Grid>
         <Message
           error
           content="Only logged in users can access the retro creation page"
           size="tiny"
           hidden={!props.error}
         />
-        <Modal.Description>
-          <Header>All open retros to join:</Header>
+        <Grid.Row style={{ margin: "5px" }}>
+          <h3>All open retros to join:</h3>
+        </Grid.Row>
+        <Grid.Row>
           <Router>
-            <List selection verticalAlign="middle">
-              <List.Item onClick={() => history.push("/retro")}>
-                <List.Content>
-                  <List.Header> Helen </List.Header>
-                </List.Content>
-              </List.Item>
-              <List.Item>
-                <List.Content>
-                  <List.Header>Christian</List.Header>
-                </List.Content>
-              </List.Item>
-              <List.Item>
-                <List.Content>
-                  <List.Header>Daniel</List.Header>
-                </List.Content>
-              </List.Item>
+            <List selection>
+              {retros.map((retro) => {
+                return (
+                  <List.Item
+                    onClick={() => history.push(`/retro?id=${retro.id}`)}
+                  >
+                    <List.Content>
+                      <List.Header>{retro.id}</List.Header>
+                    </List.Content>
+                  </List.Item>
+                );
+              })}
             </List>
           </Router>
-        </Modal.Description>
-      </Modal.Content>
-    </Modal>
+        </Grid.Row>
+      </Grid>
+    </Container>
   );
 }
 
