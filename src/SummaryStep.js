@@ -4,13 +4,13 @@ import { v4 as uuid } from "uuid";
 import {
   Container,
   Divider,
-  Grid,
-  Input,
-  Button,
   List,
   Icon,
   Label,
 } from "semantic-ui-react";
+import queryString from "query-string";
+import { useLocation } from "react-router-dom";
+import api from "./api";
 
 const SummaryStep = (props) => {
   const [opinions, setOpinions] = useState([
@@ -66,14 +66,23 @@ const SummaryStep = (props) => {
 
   const [sortedGoodOpinions, setSortedGoodOpinions] = useState([]);
   const [sortedBadOpinions, setSortedBadOpinions] = useState([]);
+  const retroId = queryString.parse(useLocation().search);
 
   useEffect(() => {
-    const onlyGood = opinions.filter(opinion => opinion.isPositive);
-    const onlyBad = opinions.filter(opinion => !opinion.isPositive)
-    const sortedGood = onlyGood.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
-    const sortedBad = onlyBad.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
-    setSortedGoodOpinions(sortedGood);
-    setSortedBadOpinions(sortedBad);
+    async function fetchData() {
+      const { opinions } = await api.getRetro(retroId.id);
+      const onlyGood = opinions.filter((opinion) => opinion.isPositive);
+      const onlyBad = opinions.filter((opinion) => !opinion.isPositive);
+      const sortedGood = onlyGood.sort(
+        (opinionA, opinionB) => opinionB.votes - opinionA.votes
+      );
+      const sortedBad = onlyBad.sort(
+        (opinionA, opinionB) => opinionB.votes - opinionA.votes
+      );
+      setSortedGoodOpinions(sortedGood);
+      setSortedBadOpinions(sortedBad);
+    }
+    fetchData();
   }, []);
 
   return (
@@ -82,10 +91,7 @@ const SummaryStep = (props) => {
         <List>
           {sortedGoodOpinions.map((opinion) => {
             return (
-              <List.Item
-                style={{ padding: "5px" }}
-                key={opinion.id}
-              >
+              <List.Item style={{ padding: "5px" }} key={opinion.id}>
                 <List.Content floated="left">
                   <List.Description>
                     {opinion.isPositive ? (
@@ -107,10 +113,7 @@ const SummaryStep = (props) => {
         <List>
           {sortedBadOpinions.map((opinion) => {
             return (
-              <List.Item
-                style={{ padding: "5px" }}
-                key={opinion.id}
-              >
+              <List.Item style={{ padding: "5px" }} key={opinion.id}>
                 <List.Content floated="left">
                   <List.Description>
                     {opinion.isPositive ? (

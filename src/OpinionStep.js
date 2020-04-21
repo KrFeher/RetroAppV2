@@ -35,7 +35,7 @@ const OpinionStep = (props) => {
   const [currentIsPositive, setCurrentIsPositive] = useState("default");
   const [newOpinion, setNewOpinion] = useState("");
   const [currentRetro, setCurrentRetro] = useState("");
-  const [showError, setShowError] = useState(false)
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -103,7 +103,7 @@ const OpinionStep = (props) => {
   return (
     <div>
       <Container>
-      <Message
+        <Message
           error
           content="Something went wrong server side. Please try again."
           size="tiny"
