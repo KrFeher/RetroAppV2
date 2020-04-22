@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import "semantic-ui-css/semantic.min.css";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Retro from "./Retro";
 import Admin from './Admin';
 import LoginPage from "./LoginPage";

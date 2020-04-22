@@ -4,9 +4,6 @@ import {
   Container,
   Divider,
   Grid,
-  Transition,
-  Button,
-  Icon,
 } from "semantic-ui-react";
 import OpinionStep from "./OpinionStep";
 import VoteStep from "./VoteStep";
