@@ -40,6 +40,7 @@ const OpinionStep = (props) => {
   useEffect(() => {
     async function fetchData() {
       const response = await api.getRetro(retroId.id);
+      debugger;
       setCurrentRetro(response);
     }
     fetchData();

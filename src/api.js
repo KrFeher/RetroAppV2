@@ -4,15 +4,22 @@ const BASE_URL = process.env.REACT_APP_API_URI;
 const api = {
   async getRetros() {
     let url = `${BASE_URL}/api/retros`;
-
-    const result = await axios.get(url);
-    return result.data;
+    let retros;
+    try {
+      const result = await axios.get(url);
+      retros = result.data;
+    } catch (error) {
+      // nothing needed here.
+    }
+    return retros;
   },
 
   async getRetro(id) {
     let url = `${BASE_URL}/api/retro/${id}`;
-
-    const result = await axios.get(url);
+    let result;
+    try {
+      result = await axios.get(url);
+    } catch (error) {}
     return result.data;
   },
 
@@ -32,16 +39,24 @@ const api = {
 
   async addRetro(id) {
     let url = `${BASE_URL}/api/retro/${id}`;
-
-    const response = await axios.post(url);
-    return response.status === 200;
+    let response;
+    try {
+      response = await axios.post(url);
+      return response.status === 200;
+    } catch (error) {
+      return false;
+    }
   },
 
   async deleteRetro(id) {
     let url = `${BASE_URL}/api/retro/${id}`;
-
-    const response = await axios.delete(url);
-    return response.status === 200;
+    let response;
+    try {
+      response = await axios.delete(url);
+      return response.status === 200;
+    } catch (error) {
+      return false;
+    }
   },
 };
 
