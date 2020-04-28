@@ -24,7 +24,6 @@ const Admin = () => {
   const addRetro = async () => {
     setIsWaitingForResponse(true);
     if (newRetroName) {
-      debugger;
       if (!retros.find((retro) => retro._id === newRetroName)) {
         const result = await api.addRetro(newRetroName);
         if (!result) {
@@ -67,7 +66,7 @@ const Admin = () => {
   };
 
   return (
-    <Container style={{ width: "500px", border: "1px solid", margin: "15px", padding: "15px" }}>
+    <Container style={{ width: "500px", margin: "15px", padding: "15px" }}>
       <Grid>
         <Grid.Column floated="left" width={12}>
           <h2>Create new retro</h2>

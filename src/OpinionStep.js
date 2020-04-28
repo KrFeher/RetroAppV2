@@ -1,46 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
-import {
-  Container,
-  Divider,
-  Grid,
-  Input,
-  Button,
-  List,
-  Icon,
-  Message,
-} from "semantic-ui-react";
+import { Container, Divider, Grid, Input, Button, List, Icon, Confirm } from "semantic-ui-react";
 import api from "./api";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
+import { toast } from "react-toastify";
 
 const OpinionStep = (props) => {
   // States
-  const exampleUuids = [uuid(), uuid()];
   let location = useLocation();
   const retroId = queryString.parse(location.search);
 
   const [opinions, setOpinions] = useState([
     {
-      id: exampleUuids[0],
+      _id: uuid(),
       description: "Example Positive Feedback",
       isPositive: true,
+      example: true,
     },
     {
-      id: exampleUuids[1],
+      _id: uuid(),
       description: "Example Negative Feedback",
       isPositive: false,
+      example: true,
     },
   ]);
+
   const [currentIsPositive, setCurrentIsPositive] = useState("default");
   const [newOpinion, setNewOpinion] = useState("");
   const [currentRetro, setCurrentRetro] = useState("");
-  const [showError, setShowError] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [inputError, setInputError] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      const response = await api.getRetro(retroId.id);
-      debugger;
+      const response = await api.getRetro(retroId._id);
       setCurrentRetro(response);
     }
     fetchData();
@@ -64,96 +59,76 @@ const OpinionStep = (props) => {
   };
 
   const addOpinion = () => {
-    if (currentIsPositive !== "default" && newOpinion) {
-      setOpinions([
-        ...opinions,
-        { id: uuid(), description: newOpinion, isPositive: currentIsPositive },
-      ]);
+    if (!newOpinion) {
+      toast("Enter something first.", { type: "info" });
+      setInputError(true);
+      return;
     }
+    if (currentIsPositive === "default") {
+      toast("Choose an intention.", { type: "info" });
+      return;
+    }
+
+    setOpinions([...opinions, { _id: uuid(), description: newOpinion, isPositive: currentIsPositive }]);
   };
 
   const deleteOpinion = (id) => {
     const newArray = opinions.filter((opinion) => {
-      return opinion.id !== id;
+      return opinion._id !== id;
     });
     setOpinions([...newArray]);
   };
 
   const saveOpinions = async () => {
-    return await api.submitRetroOpinions(retroId.id, opinions);
-    // check if anything is filled in at all, if not show warning message but proceed.
-    // if pressed ok or there's at least 1 item then
-    // remove the 2 example up top
-    // .....
-    // call back-end to save data
+    const arrayWithoutExamples = opinions.filter((item) => !item.example);
+    return arrayWithoutExamples ? await api.submitRetroOpinions(retroId._id, arrayWithoutExamples) : null;
   };
 
   const onOpinionInputChange = (event) => {
+    if (inputError) setInputError(false);
     setNewOpinion(event.target.value);
   };
 
-  const onNextStepClick = async () => {
+  const onNextStepClick = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const onConfirmCancelClick = () => {
+    setIsConfirmOpen(false);
+  };
+
+  const onConfirmOkayClick = async () => {
+    setIsConfirmOpen(false);
+    setIsWaitingForResponse(true);
     const isSuccess = await saveOpinions();
+    setIsWaitingForResponse(false);
     if (isSuccess) {
       props.finishedAddingAction(1);
     } else {
-      setShowError(true);
+      toast("Something went wrong saving your opinions. Please try again.", { type: "error" });
     }
   };
 
   return (
     <div>
       <Container>
-        <Message
-          error
-          content="Something went wrong server side. Please try again."
-          size="tiny"
-          hidden={!showError}
-        />
         <Grid>
           <Grid.Column>
             <Grid.Row style={{ paddingBottom: "10px" }}>
-              <Input
-                label="Write an opinion : "
-                onChange={onOpinionInputChange}
-              ></Input>
+              <Input label="Write an opinion : " onChange={onOpinionInputChange} error={inputError}></Input>
             </Grid.Row>
             <Grid.Row style={{ paddingBottom: "10px" }}>
               {"Choose intention: "}
               {currentIsPositive === "default" ? (
-                <Button
-                  circular
-                  size="tiny"
-                  style={{ marginLeft: "10px" }}
-                  onClick={onCurrentIconClick}
-                >
+                <Button circular size="tiny" style={{ marginLeft: "10px" }} onClick={onCurrentIconClick}>
                   Choose
                 </Button>
               ) : currentIsPositive ? (
-                <Button
-                  circular
-                  icon="plus"
-                  size="tiny"
-                  style={{ marginLeft: "10px" }}
-                  color="green"
-                  onClick={onCurrentIconClick}
-                ></Button>
+                <Button circular icon="plus" size="tiny" style={{ marginLeft: "10px" }} color="green" onClick={onCurrentIconClick}></Button>
               ) : (
-                <Button
-                  circular
-                  icon="minus"
-                  size="tiny"
-                  style={{ marginLeft: "10px" }}
-                  color="red"
-                  onClick={onCurrentIconClick}
-                ></Button>
+                <Button circular icon="minus" size="tiny" style={{ marginLeft: "10px" }} color="red" onClick={onCurrentIconClick}></Button>
               )}
-              <Button
-                floated="right"
-                size="tiny"
-                color="olive"
-                onClick={addOpinion}
-              >
+              <Button floated="right" size="tiny" color="olive" onClick={addOpinion}>
                 Add opinion
               </Button>
             </Grid.Row>
@@ -164,24 +139,15 @@ const OpinionStep = (props) => {
         <List>
           {opinions.map((opinion) => {
             return (
-              <List.Item style={{ padding: "5px" }} key={opinion.id}>
+              <List.Item style={{ padding: "5px" }} key={opinion._id}>
                 <List.Content floated="left">
                   <List.Description>
-                    {opinion.isPositive ? (
-                      <Icon name="plus" color="green" />
-                    ) : (
-                      <Icon name="minus" color="red" />
-                    )}
+                    {opinion.isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
                     {opinion.description}
                   </List.Description>
                 </List.Content>
                 <List.Content floated="right">
-                  <Button
-                    size="mini"
-                    icon="trash"
-                    circular
-                    onClick={() => deleteOpinion(opinion.id)}
-                  ></Button>
+                  <Button size="mini" icon="trash" circular onClick={() => deleteOpinion(opinion._id)}></Button>
                 </List.Content>
               </List.Item>
             );
@@ -189,10 +155,16 @@ const OpinionStep = (props) => {
         </List>
       </Container>
       <Container textAlign="right" style={{ paddingTop: "30px" }}>
-        <Button icon labelPosition="right" onClick={onNextStepClick}>
-          Next step: Vote
+        <Button icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
+          Vote
           <Icon name="right arrow" />
         </Button>
+        <Confirm
+          open={isConfirmOpen}
+          onCancel={onConfirmCancelClick}
+          onConfirm={onConfirmOkayClick}
+          content="Are you sure you want to submit your opinion? There is no return."
+        />
       </Container>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Button, Grid, List, Message, Divider, Placeholder } from "semantic-ui-react";
+import { Container, Button, Grid, List, Divider, Placeholder, Icon } from "semantic-ui-react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import api from "./api";
@@ -11,24 +11,24 @@ function LoginPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      const response = await api.getRetros();
-      if (!response) {
-        toast("Could not read retros from server. Something is wrong!", { type: "error" });
-      } else {
-        setRetros(response);
-      }
-      setIsLoading(false);
-    }
-    fetchData();
+    fetchRetros();
   }, []);
+
+  const fetchRetros = async () => {
+    setIsLoading(true);
+    const response = await api.getRetros();
+    if (!response) {
+      toast("Could not read retros from server. Something is wrong!", { type: "error" });
+    } else {
+      setRetros(response);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <Container
       style={{
         width: "500px",
-        border: "1px solid",
         margin: "15px",
         padding: "15px",
       }}
@@ -44,7 +44,6 @@ function LoginPage() {
       </Grid>
       {isLoading ? (
         <React.Fragment>
-          {"loading retros..."}
           <Placeholder>
             <Placeholder.Line />
             <Placeholder.Line />
@@ -63,7 +62,7 @@ function LoginPage() {
               <List selection>
                 {retros.map((retro) => {
                   return (
-                    <List.Item onClick={() => history.push(`/retro?id=${retro._id}`)}>
+                    <List.Item key={retro._id} onClick={() => history.push(`/retro?_id=${retro._id}`)}>
                       <List.Content>
                         <List.Header>{retro._id}</List.Header>
                       </List.Content>
@@ -75,6 +74,9 @@ function LoginPage() {
           </Grid.Row>
         </Grid>
       )}
+      <Button style={{marginTop : '10px'}} circular icon onClick={fetchRetros} loading={isLoading}>
+        <Icon name="refresh" />
+      </Button>
     </Container>
   );
 }

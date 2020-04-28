@@ -36,7 +36,6 @@ const Retro = () => {
     <Container
       style={{
         width: "600px",
-        border: "1px solid",
         margin: "15px",
         padding: "15px",
       }}

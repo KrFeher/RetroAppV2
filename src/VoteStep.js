@@ -1,97 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuid } from "uuid";
-import { Container, Button, List, Icon, Message } from "semantic-ui-react";
+import { Container, Button, List, Icon, Confirm, Grid } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
 import api from "./api";
+import { toast } from "react-toastify";
 
 export const VoteStep = (props) => {
-  // Delete once database call is made
-  const [opinions, setOpinions] = useState([
-    {
-      id: uuid(),
-      description: "Example Positive Feedback1",
-      isPositive: true,
-    },
-    {
-      id: uuid(),
-      description: "Example Positive Feedback2",
-      isPositive: true,
-    },
-    {
-      id: uuid(),
-      description: "Example Positive Feedback3",
-      isPositive: true,
-    },
-    {
-      id: uuid(),
-      description: "Example Positive Feedback4",
-      isPositive: true,
-    },
-    {
-      id: uuid(),
-      description: "Example Negative Feedback1",
-      isPositive: false,
-    },
-    {
-      id: uuid(),
-      description: "Example Negative Feedback2",
-      isPositive: false,
-    },
-    {
-      id: uuid(),
-      description: "Example Negative Feedback3",
-      isPositive: false,
-    },
-    {
-      id: uuid(),
-      description: "Example Negative Feedback4",
-      isPositive: false,
-    },
-  ]);
-
   const [opinionsWithVotes, setOpinionsWithVotes] = useState([]);
   const retroId = queryString.parse(useLocation().search);
-  const [showError, setShowError] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      const currentRetro = await api.getRetro(retroId.id);
-      currentRetro.opinions = currentRetro.opinions.sort((x, y) => (x.isPositive === y.isPositive ? 0 : x.isPositive ? -1 : 1));
-
-      let newStates = {};
-      currentRetro.opinions.forEach((opinion) => {
-        newStates = {
-          ...newStates,
-          [opinion.id]: {
-            description: opinion.description,
-            isPositive: opinion.isPositive,
-            upVoted: false,
-          },
-        };
-        // this structure is better because arrays would change as new results gets added dynamically
-      });
-      setOpinionsWithVotes(newStates);
-    }
-    fetchData();
+    fetchOpinions();
   }, []);
 
-  const onNextStepClick = async () => {
-    // TODO: warning if nothing is voted, but let them through
-    const votedOpinionIds = Object.entries(opinionsWithVotes)
-      .map((opinion) => {
-        return opinion[1].upVoted ? opinion[0] : null;
-      })
-      .filter((item) => item !== null);
+  const fetchOpinions = async () => {
+    setIsWaitingForResponse(true);
+    const currentRetro = await api.getRetro(retroId._id);
+    setIsWaitingForResponse(false);
+    currentRetro.opinions = currentRetro.opinions.sort((x, y) => (x.isPositive === y.isPositive ? 0 : x.isPositive ? -1 : 1));
 
-    const isSuccess = await api.submitVotesOnOpinion(retroId.id, votedOpinionIds);
-    if (isSuccess) {
-      props.finishedAddingAction(1);
-    } else {
-      setShowError(true);
-    }
-    props.finishedAddingAction(2);
-  };
+    let newStates = {};
+    currentRetro.opinions.forEach((opinion) => {
+      newStates = {
+        ...newStates,
+        [opinion._id]: {
+          description: opinion.description,
+          isPositive: opinion.isPositive,
+          upVoted: false,
+        },
+      };
+      // this structure is better because arrays would change as new results gets added dynamically
+    });
+    setOpinionsWithVotes(newStates);
+  }
 
   const voteUpOpinion = (id) => {
     setOpinionsWithVotes({
@@ -103,10 +47,36 @@ export const VoteStep = (props) => {
     });
   };
 
+  const onNextStepClick = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const onConfirmCancelClick = () => {
+    setIsConfirmOpen(false);
+  };
+
+  const onConfirmOkayClick = async () => {
+    setIsConfirmOpen(false);
+    setIsWaitingForResponse(true);
+
+    const votedOpinionIds = Object.entries(opinionsWithVotes)
+      .map((opinion) => {
+        return opinion[1].upVoted ? opinion[0] : null;
+      })
+      .filter((item) => item !== null);
+
+    const isSuccess = await api.submitVotesOnOpinion(retroId._id, votedOpinionIds);
+    setIsWaitingForResponse(false);
+    if (isSuccess) {
+      props.finishedAddingAction(2);
+    } else {
+      toast("Something went wrong saving your votes. Please try again.", { type: "error" });
+    }
+  };
+
   return (
     <div>
       <Container>
-        <Message error content="Something went wrong server side. Please try again." size="tiny" hidden={!showError} />
         <List>
           {Object.entries(opinionsWithVotes).map((opinion) => {
             return (
@@ -131,11 +101,20 @@ export const VoteStep = (props) => {
           })}
         </List>
       </Container>
-      <Container textAlign="right" style={{ paddingTop: "30px" }}>
-        <Button icon labelPosition="right" onClick={onNextStepClick}>
-          Next step: See Summary
-          <Icon name="right arrow" />
-        </Button>
+        <Container style={{ paddingTop: "30px" }}>
+            <Button circular floated='left' name="refresh" size='large' onClick={fetchOpinions} icon loading={isWaitingForResponse}>
+              <Icon name='refresh'/>
+            </Button>
+            <Button floated='right' icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
+              See Summary
+              <Icon name="right arrow" />
+            </Button>
+            <Confirm
+              open={isConfirmOpen}
+              onCancel={onConfirmCancelClick}
+              onConfirm={onConfirmOkayClick}
+              content="Are you sure you want to submit your votes? There is no return."
+            />
       </Container>
     </div>
   );
