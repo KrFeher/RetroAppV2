@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuid } from "uuid";
 import { Container, Divider, Grid, Input, Button, List, Icon, Confirm } from "semantic-ui-react";
-import api from "./api";
+import api from "../api";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import { toast } from "react-toastify";

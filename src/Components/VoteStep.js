@@ -3,7 +3,7 @@ import { v4 as uuid } from "uuid";
 import { Container, Button, List, Icon, Confirm, Grid } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
-import api from "./api";
+import api from "../api";
 import { toast } from "react-toastify";
 
 export const VoteStep = (props) => {

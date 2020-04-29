@@ -1,10 +1,5 @@
-import React, { useState } from "react";
-import {
-  Breadcrumb,
-  Container,
-  Divider,
-  Grid,
-} from "semantic-ui-react";
+import React, { useState, useEffect } from "react";
+import { Breadcrumb, Container, Divider, Grid } from "semantic-ui-react";
 import OpinionStep from "./OpinionStep";
 import VoteStep from "./VoteStep";
 import SummaryStep from "./SummaryStep";
@@ -43,27 +38,17 @@ const Retro = () => {
       <Grid>
         <Grid.Column textAlign="center">
           <Breadcrumb>
-            <Breadcrumb.Section active={activeBreadCrumb === 1}>
-              Add opinion
-            </Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 1}>Add opinion</Breadcrumb.Section>
             <Breadcrumb.Divider icon="right arrow" />
-            <Breadcrumb.Section active={activeBreadCrumb === 2}>
-              Vote for others
-            </Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 2}>Vote for others</Breadcrumb.Section>
             <Breadcrumb.Divider icon="right arrow" />
-            <Breadcrumb.Section active={activeBreadCrumb === 3}>
-              See summary
-            </Breadcrumb.Section>
+            <Breadcrumb.Section active={activeBreadCrumb === 3}>See summary</Breadcrumb.Section>
           </Breadcrumb>
           <Divider />
         </Grid.Column>
       </Grid>
-      {opinionStepVisibility && (
-        <OpinionStep finishedAddingAction={onNextStepClick} />
-      )}
-      {voteStepVisibility && (
-        <VoteStep finishedAddingAction={onNextStepClick}></VoteStep>
-      )}
+      {opinionStepVisibility && <OpinionStep finishedAddingAction={onNextStepClick} />}
+      {voteStepVisibility && <VoteStep finishedAddingAction={onNextStepClick}></VoteStep>}
       {summaryStepVisibility && <SummaryStep></SummaryStep>}
     </Container>
   );

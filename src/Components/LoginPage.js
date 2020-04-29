@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Container, Button, Grid, List, Divider, Placeholder, Icon } from "semantic-ui-react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import api from "./api";
+import api from "../api";
 import { toast } from "react-toastify";
+import actions from "../actions";
 
 function LoginPage() {
   let history = useHistory();
-  const [retros, setRetros] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  let retros = useSelector((state) => state);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchRetros();
@@ -20,7 +23,7 @@ function LoginPage() {
     if (!response) {
       toast("Could not read retros from server. Something is wrong!", { type: "error" });
     } else {
-      setRetros(response);
+      dispatch(actions.setRetros(response));
     }
     setIsLoading(false);
   };
@@ -74,7 +77,7 @@ function LoginPage() {
           </Grid.Row>
         </Grid>
       )}
-      <Button style={{marginTop : '10px'}} circular icon onClick={fetchRetros} loading={isLoading}>
+      <Button style={{ marginTop: "10px" }} circular icon onClick={fetchRetros} loading={isLoading}>
         <Icon name="refresh" />
       </Button>
     </Container>

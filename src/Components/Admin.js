@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Container, Button, Input, Divider, List, Grid, Loader } from "semantic-ui-react";
-import api from "./api";
+import api from "../api";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 
 const Admin = () => {
   const [retros, setRetros] = useState([]);
   const [newRetroName, setNewRetroName] = useState("");
   const [inputError, setInputError] = useState(false);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+
+  let history = useHistory();
 
   useEffect(() => {
     async function fetchData() {
@@ -83,7 +86,7 @@ const Admin = () => {
         {retros.map((retro) => (
           <List.Item key={retro._id}>
             <List.Content floated="left">
-              <h4 style={{ padding: "5px" }}>{retro._id}</h4>
+              <Button basic style={{ padding: "5px" }} onClick={()=> history.push(`/retro?_id=${retro._id}`)}>{retro._id}</Button>
             </List.Content>
             <List.Content floated="right">
               <Button color="red" size="tiny" onClick={() => deleteRetro(retro._id)}>

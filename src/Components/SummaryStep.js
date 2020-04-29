@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Divider, List, Icon, Label, Button } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
-import api from "./api";
+import api from "../api";
 
 const SummaryStep = (props) => {
   const [sortedGoodOpinions, setSortedGoodOpinions] = useState([]);

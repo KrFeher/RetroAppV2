@@ -1,7 +1,24 @@
 import axios from "axios";
 const BASE_URL = process.env.REACT_APP_API_URI;
+const events = new EventSource(`${BASE_URL}/api/events`);
+let isRealTimeUpdateRunning = false;
 
 const api = {
+  startRealTimeUpdate(callbackFunction) {
+    if (!isRealTimeUpdateRunning) {
+      events.onmessage = (event) => {
+        const parsedData = JSON.parse(event.data);
+        callbackFunction(parsedData);
+      };
+      isRealTimeUpdateRunning = true;
+    }
+  },
+
+  stopRealTimeUpdate() {
+    events.close();
+    isRealTimeUpdateRunning = false;
+  },
+
   async getRetros() {
     let url = `${BASE_URL}/api/retros`;
     let retros;
