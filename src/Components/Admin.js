@@ -81,7 +81,7 @@ const Admin = () => {
       <Input placeholder={"unique retro name"} onChange={onRetroNameChange} error={inputError}></Input>
       <Button onClick={addRetro}>Create</Button>
       <Divider></Divider>
-      <h2>Retro management</h2>
+      <h2>Currently available retros</h2>
       <List>
         {retros.map((retro) => (
           <List.Item key={retro._id}>

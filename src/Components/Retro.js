@@ -31,8 +31,8 @@ const Retro = () => {
     <Container
       style={{
         width: "600px",
-        margin: "15px",
-        padding: "15px",
+        margin: "0px",
+        padding: "0px",
       }}
     >
       <Grid>

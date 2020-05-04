@@ -5,6 +5,7 @@ import api from "../api";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import { toast } from "react-toastify";
+import Footer from "./Footer";
 
 const OpinionStep = (props) => {
   // States
@@ -110,7 +111,7 @@ const OpinionStep = (props) => {
   };
 
   return (
-    <div>
+    <React.Fragment>
       <Container>
         <Grid>
           <Grid.Column>
@@ -154,9 +155,9 @@ const OpinionStep = (props) => {
           })}
         </List>
       </Container>
-      <Container textAlign="right" style={{ paddingTop: "30px" }}>
-        <Button icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
-          Vote
+      <Footer>
+        <Button size="small" circular color="teal" icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
+          Submit opinions
           <Icon name="right arrow" />
         </Button>
         <Confirm
@@ -165,8 +166,8 @@ const OpinionStep = (props) => {
           onConfirm={onConfirmOkayClick}
           content="Are you sure you want to submit your opinion? There is no return."
         />
-      </Container>
-    </div>
+      </Footer>
+    </React.Fragment>
   );
 };
 
