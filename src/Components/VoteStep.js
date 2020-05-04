@@ -1,29 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { v4 as uuid } from "uuid";
-import { Container, Button, List, Icon, Confirm, Grid } from "semantic-ui-react";
+import { useSelector } from "react-redux";
+import { Container, Button, List, Icon, Confirm } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
 import api from "../api";
 import { toast } from "react-toastify";
 
 export const VoteStep = (props) => {
-  const [opinionsWithVotes, setOpinionsWithVotes] = useState([]);
-  const retroId = queryString.parse(useLocation().search);
+  const [opinionsWithVotes, setOpinionsWithVotes] = useState({});
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [retroId, setRetroId] = useState(queryString.parse(useLocation().search)._id);
+
+  let realTimeRetro = useSelector((state) => state.find((retro) => retro._id === retroId));
 
   useEffect(() => {
     fetchOpinions();
   }, []);
 
+  useEffect(() => {
+    if (realTimeRetro && Object.keys(opinionsWithVotes).length > 0) {
+      const newRealTimeOpinionsIds = realTimeRetro.opinions.map((opinion) => opinion._id);
+      const oldOpinionIds = Object.keys(opinionsWithVotes);
+      const isThereNew = newRealTimeOpinionsIds.some(newId => !oldOpinionIds.includes(newId))
+      if (isThereNew) {
+        toast("New opinions have came in. Press refresh to see them.", { type: "info" });
+      } // don't want to auto-update opinions on purpose. Let user do it.
+    }
+  }, [realTimeRetro]);
+
   const fetchOpinions = async () => {
     setIsWaitingForResponse(true);
-    const currentRetro = await api.getRetro(retroId._id);
+    const currentRetro = await api.getRetro(retroId);
     setIsWaitingForResponse(false);
-    currentRetro.opinions = currentRetro.opinions.sort((x, y) => (x.isPositive === y.isPositive ? 0 : x.isPositive ? -1 : 1));
+    const newOpinions = currentRetro.opinions.filter(opinion => !Object.keys(opinionsWithVotes).includes(opinion._id));
 
     let newStates = {};
-    currentRetro.opinions.forEach((opinion) => {
+    newOpinions.forEach((opinion) => {
       newStates = {
         ...newStates,
         [opinion._id]: {
@@ -32,10 +45,9 @@ export const VoteStep = (props) => {
           upVoted: false,
         },
       };
-      // this structure is better because arrays would change as new results gets added dynamically
     });
-    setOpinionsWithVotes(newStates);
-  }
+    setOpinionsWithVotes({...opinionsWithVotes, ...newStates});
+  };
 
   const voteUpOpinion = (id) => {
     setOpinionsWithVotes({
@@ -65,7 +77,7 @@ export const VoteStep = (props) => {
       })
       .filter((item) => item !== null);
 
-    const isSuccess = await api.submitVotesOnOpinion(retroId._id, votedOpinionIds);
+    const isSuccess = await api.submitVotesOnOpinion(retroId, votedOpinionIds);
     setIsWaitingForResponse(false);
     if (isSuccess) {
       props.finishedAddingAction(2);
@@ -101,20 +113,20 @@ export const VoteStep = (props) => {
           })}
         </List>
       </Container>
-        <Container style={{ paddingTop: "30px" }}>
-            <Button circular floated='left' name="refresh" size='large' onClick={fetchOpinions} icon loading={isWaitingForResponse}>
-              <Icon name='refresh'/>
-            </Button>
-            <Button floated='right' icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
-              See Summary
-              <Icon name="right arrow" />
-            </Button>
-            <Confirm
-              open={isConfirmOpen}
-              onCancel={onConfirmCancelClick}
-              onConfirm={onConfirmOkayClick}
-              content="Are you sure you want to submit your votes? There is no return."
-            />
+      <Container style={{ paddingTop: "30px" }}>
+        <Button circular floated="left" name="refresh" size="large" onClick={fetchOpinions} icon loading={isWaitingForResponse}>
+          <Icon name="refresh" />
+        </Button>
+        <Button floated="right" icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
+          See Summary
+          <Icon name="right arrow" />
+        </Button>
+        <Confirm
+          open={isConfirmOpen}
+          onCancel={onConfirmCancelClick}
+          onConfirm={onConfirmOkayClick}
+          content="Are you sure you want to submit your votes? There is no return."
+        />
       </Container>
     </div>
   );

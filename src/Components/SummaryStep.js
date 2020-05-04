@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Container, Divider, List, Icon, Label, Button } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
@@ -7,23 +8,35 @@ import api from "../api";
 const SummaryStep = (props) => {
   const [sortedGoodOpinions, setSortedGoodOpinions] = useState([]);
   const [sortedBadOpinions, setSortedBadOpinions] = useState([]);
-  const retroId = queryString.parse(useLocation().search);
+  const [retroId, setRetroId] = useState(queryString.parse(useLocation().search)._id);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+
+  let retro = useSelector((state) => state.find(retro => retro._id === retroId));
 
   useEffect(() => {
     fetchVotedOpinions();
   }, []);
 
+  useEffect(() => {
+    setOpinionsSorted(retro.opinions);
+  }, [retro]);
+
   const fetchVotedOpinions = async () => {
     setIsWaitingForResponse(true);
-    const { opinions } = await api.getRetro(retroId._id);
+    const { opinions } = await api.getRetro(retroId);
     setIsWaitingForResponse(false);
-    const onlyGood = opinions.filter((opinion) => opinion.isPositive);
-    const onlyBad = opinions.filter((opinion) => !opinion.isPositive);
-    const sortedGood = onlyGood.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
-    const sortedBad = onlyBad.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
-    setSortedGoodOpinions(sortedGood);
-    setSortedBadOpinions(sortedBad);
+    setOpinionsSorted(opinions);
+  };
+
+  const setOpinionsSorted = (opinions) => {
+    if (opinions) {
+      const onlyGood = opinions.filter((opinion) => opinion.isPositive);
+      const onlyBad = opinions.filter((opinion) => !opinion.isPositive);
+      const sortedGood = onlyGood.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
+      const sortedBad = onlyBad.sort((opinionA, opinionB) => opinionB.votes - opinionA.votes);
+      setSortedGoodOpinions(sortedGood);
+      setSortedBadOpinions(sortedBad);
+    }
   };
 
   return (
@@ -64,9 +77,6 @@ const SummaryStep = (props) => {
             );
           })}
         </List>
-        <Button circular floated="left" name="refresh" size="large" onClick={fetchVotedOpinions} loading={isWaitingForResponse} icon>
-          <Icon name="refresh" />
-        </Button>
       </Container>
     </div>
   );
