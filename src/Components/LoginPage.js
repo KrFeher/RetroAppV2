@@ -49,11 +49,11 @@ function LoginPage() {
           }}
         >
           <Grid.Column floated="left" width={8}>
-            <h1>Retro app</h1>
+            <h1 style={{ textTransform: "uppercase" }}>Retro app</h1>
           </Grid.Column>
           <Grid.Column floated="right" width={8} textAlign="right">
             <Button size="small" circular color="teal" onClick={() => history.push("/admin")}>
-              Retro management >>{" "}
+              Retro management{" "}
             </Button>
           </Grid.Column>
         </Grid>
@@ -72,8 +72,9 @@ function LoginPage() {
               <Router>
                 {retros.map((retro) => {
                   return (
-                    <Grid.Column style={{ padding: "10px 4px 0px 0px" }}>
+                    <Grid.Column style={{ padding: "10px 14px 0px 0px" }}>
                       <Popup
+                        mouseEnterDelay={1000}
                         trigger={
                           <Card key={retro._id} onClick={() => history.push(`/retro?_id=${retro._id}`)}>
                             <Card.Content

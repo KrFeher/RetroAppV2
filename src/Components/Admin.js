@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Input, Divider, List, Grid, Loader } from "semantic-ui-react";
+import { Container, Button, Input, Divider, Card, Grid, Loader, Popup, Label, Icon } from "semantic-ui-react";
 import api from "../api";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
+import Footer from "./Footer";
+import Header from "./Header";
+import util from "./utils";
 
 const Admin = () => {
   const [retros, setRetros] = useState([]);
@@ -46,16 +49,21 @@ const Admin = () => {
     setIsWaitingForResponse(false);
   };
 
-  const deleteRetro = async (retroId) => {
-    setIsWaitingForResponse(true);
-    const result = await api.deleteRetro(retroId);
-    if (!result) {
-      toast("Something went wrong while deleting retro, please try again!", { type: "error" });
+  const deleteRetro = async (e, retroId) => {
+    e.stopPropagation();
+    if (!isWaitingForResponse) {
+      setIsWaitingForResponse(true);
+      const result = await api.deleteRetro(retroId);
+      if (!result) {
+        toast("Something went wrong while deleting retro, please try again!", { type: "error" });
+      } else {
+        const response = await api.getRetros();
+        setRetros(response);
+      }
+      setIsWaitingForResponse(false);
     } else {
-      const response = await api.getRetros();
-      setRetros(response);
+      toast("Operation is in progress, please wait.", { type: "info" });
     }
-    setIsWaitingForResponse(false);
   };
 
   const onRetroNameChange = (event) => {
@@ -69,34 +77,88 @@ const Admin = () => {
   };
 
   return (
-    <Container style={{ width: "500px", margin: "15px", padding: "15px" }}>
-      <Grid>
-        <Grid.Column floated="left" width={12}>
-          <h2>Create new retro</h2>
-        </Grid.Column>
-        <Grid.Column floated="right" width={2}>
-          <Loader active={isWaitingForResponse}></Loader>
-        </Grid.Column>
-      </Grid>
-      <Input placeholder={"unique retro name"} onChange={onRetroNameChange} error={inputError}></Input>
-      <Button onClick={addRetro}>Create</Button>
-      <Divider></Divider>
-      <h2>Currently available retros</h2>
-      <List>
-        {retros.map((retro) => (
-          <List.Item key={retro._id}>
-            <List.Content floated="left">
-              <Button basic style={{ padding: "5px" }} onClick={()=> history.push(`/retro?_id=${retro._id}`)}>{retro._id}</Button>
-            </List.Content>
-            <List.Content floated="right">
-              <Button color="red" size="tiny" onClick={() => deleteRetro(retro._id)}>
-                Delete
-              </Button>
-            </List.Content>
-          </List.Item>
-        ))}
-      </List>
-    </Container>
+    <div>
+      <Header pageTitle={"Retro management"}></Header>
+      <Container style={{ width: "500px", margin: "15px", padding: "15px" }}>
+        <Grid columns="1">
+          <Grid.Row>
+            <Grid.Column>
+              <Input
+                placeholder={"unique retro name"}
+                onChange={onRetroNameChange}
+                error={inputError}
+                label={
+                  <span
+                    style={{
+                      border: "2px solid",
+                      borderRadius: "0px 15px 15px 0px",
+                      borderColor: "#7761F1",
+                      background: "#7761F1",
+                      padding: "8px",
+                    }}
+                  >
+                    <span onClick={addRetro} style={{ color: "white", textTransform: "upperCase", cursor: "pointer" }}>
+                      Create
+                    </span>
+                  </span>
+                }
+                labelPosition="right"
+                style={{ width: "100%" }}
+              ></Input>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+
+        <Divider></Divider>
+        <Grid>
+          <Grid.Row columns="2">
+            <Grid.Column width="13">
+              <h2>Currently available retros</h2>
+            </Grid.Column>
+            <Grid.Column width="3" floated="right">
+              <Loader inline active={isWaitingForResponse}></Loader>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <Grid>
+          <Grid.Row columns={3}>
+            {retros.map((retro) => {
+              return (
+                <Grid.Column style={{ padding: "10px 14px 0px 0px" }}>
+                  <Popup
+                    mouseEnterDelay={1000}
+                    trigger={
+                      <div>
+                        <Card key={retro._id} onClick={() => history.push(`/retro?_id=${retro._id}`)}>
+                          <Card.Content
+                            textAlign="center"
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignContent: "center",
+                              textTransform: "uppercase",
+                              flexDirection: "column",
+                              padding: "2px",
+                              height: "50px",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <Label icon="trash" size="mini" corner="right" color="red" onClick={(event) => deleteRetro(event, retro._id)}></Label>
+                            <React.Fragment>{util.truncate(retro._id, 23)}</React.Fragment>
+                          </Card.Content>
+                        </Card>
+                      </div>
+                    }
+                    content={retro._id}
+                  ></Popup>
+                </Grid.Column>
+              );
+            })}
+          </Grid.Row>
+        </Grid>
+      </Container>
+      <Footer />
+    </div>
   );
 };
 

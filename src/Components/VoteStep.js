@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Container, Button, List, Icon, Confirm } from "semantic-ui-react";
+import { Container, Button, Icon, Confirm, Grid, Popup } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
 import api from "../api";
 import { toast } from "react-toastify";
+import Header from "./Header";
+import Footer from "./Footer";
 
 export const VoteStep = (props) => {
   const [opinionsWithVotes, setOpinionsWithVotes] = useState({});
@@ -22,7 +24,7 @@ export const VoteStep = (props) => {
     if (realTimeRetro && Object.keys(opinionsWithVotes).length > 0) {
       const newRealTimeOpinionsIds = realTimeRetro.opinions.map((opinion) => opinion._id);
       const oldOpinionIds = Object.keys(opinionsWithVotes);
-      const isThereNew = newRealTimeOpinionsIds.some(newId => !oldOpinionIds.includes(newId))
+      const isThereNew = newRealTimeOpinionsIds.some((newId) => !oldOpinionIds.includes(newId));
       if (isThereNew) {
         toast("New opinions have came in. Press refresh to see them.", { type: "info" });
       } // don't want to auto-update opinions on purpose. Let user do it.
@@ -33,7 +35,7 @@ export const VoteStep = (props) => {
     setIsWaitingForResponse(true);
     const currentRetro = await api.getRetro(retroId);
     setIsWaitingForResponse(false);
-    const newOpinions = currentRetro.opinions.filter(opinion => !Object.keys(opinionsWithVotes).includes(opinion._id));
+    const newOpinions = currentRetro.opinions.filter((opinion) => !Object.keys(opinionsWithVotes).includes(opinion._id));
 
     let newStates = {};
     newOpinions.forEach((opinion) => {
@@ -46,7 +48,7 @@ export const VoteStep = (props) => {
         },
       };
     });
-    setOpinionsWithVotes({...opinionsWithVotes, ...newStates});
+    setOpinionsWithVotes({ ...opinionsWithVotes, ...newStates });
   };
 
   const voteUpOpinion = (id) => {
@@ -85,49 +87,64 @@ export const VoteStep = (props) => {
       toast("Something went wrong saving your votes. Please try again.", { type: "error" });
     }
   };
-
   return (
     <div>
-      <Container>
-        <List>
-          {Object.entries(opinionsWithVotes).map((opinion) => {
-            return (
-              <List.Item style={{ padding: "5px" }} key={opinion[0]}>
-                <List.Content floated="left">
-                  <List.Description>
-                    {opinion[1].isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
-                    {opinion[1].description}
-                  </List.Description>
-                </List.Content>
-                <List.Content floated="right">
+      <Header pageTitle={"Vote on opinions"}></Header>
+      <Container style={{ width: "500px", padding: "20px 0px" }}>
+        {Object.entries(opinionsWithVotes).map((opinion) => {
+          return (
+            <Grid key={opinion._id}>
+              <Grid.Row style={{ padding: "5px 0px 15px 0px" }} columns="2">
+                <Grid.Column width="13" floated="left" textAlign="left">
+                  {opinion[1].isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
+                  {opinion[1].description}
+                </Grid.Column>
+                <Grid.Column width="3" floated="right" textAlign="right">
                   <Button
-                    size="mini"
+                    size="medium"
                     icon="up arrow"
                     color={opinionsWithVotes[opinion[0]].upVoted ? "green" : "grey"}
                     circular
                     onClick={() => voteUpOpinion(opinion[0])}
                   ></Button>
-                </List.Content>
-              </List.Item>
-            );
-          })}
-        </List>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          );
+        })}
       </Container>
-      <Container style={{ paddingTop: "30px" }}>
-        <Button circular floated="left" name="refresh" size="large" onClick={fetchOpinions} icon loading={isWaitingForResponse}>
-          <Icon name="refresh" />
-        </Button>
-        <Button floated="right" icon labelPosition="right" onClick={onNextStepClick} loading={isWaitingForResponse}>
-          See Summary
-          <Icon name="right arrow" />
-        </Button>
+      <Footer style={{ paddingTop: "30px" }}>
+        <Grid>
+          <Grid.Row columns="2">
+            <Grid.Column>
+                <Button floated="left" circular size="small" color="teal" onClick={fetchOpinions} icon name="refresh" loading={isWaitingForResponse}>
+                  <Popup trigger={<Icon name="refresh" />} content="Manually refresh opinions"></Popup>
+                </Button>
+            </Grid.Column>
+            <Grid.Column>
+              <Button
+                floated="right"
+                circular
+                size="small"
+                color="teal"
+                icon
+                labelPosition="right"
+                onClick={onNextStepClick}
+                loading={isWaitingForResponse}
+              >
+                See Summary
+                <Icon name="right arrow" />
+              </Button>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <Confirm
           open={isConfirmOpen}
           onCancel={onConfirmCancelClick}
           onConfirm={onConfirmOkayClick}
           content="Are you sure you want to submit your votes? There is no return."
         />
-      </Container>
+      </Footer>
     </div>
   );
 };

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Container, Divider, List, Icon, Label, Button } from "semantic-ui-react";
+import { Container, Divider, List, Icon, Label, Grid } from "semantic-ui-react";
 import queryString from "query-string";
 import { useLocation } from "react-router-dom";
 import api from "../api";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const SummaryStep = (props) => {
   const [sortedGoodOpinions, setSortedGoodOpinions] = useState([]);
@@ -11,7 +13,7 @@ const SummaryStep = (props) => {
   const [retroId, setRetroId] = useState(queryString.parse(useLocation().search)._id);
   const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
-  let retro = useSelector((state) => state.find(retro => retro._id === retroId));
+  let retro = useSelector((state) => state.find((retro) => retro._id === retroId));
 
   useEffect(() => {
     fetchVotedOpinions();
@@ -41,43 +43,43 @@ const SummaryStep = (props) => {
 
   return (
     <div>
-      <Container>
-        <List>
-          {sortedGoodOpinions.map((opinion) => {
-            return (
-              <List.Item style={{ padding: "5px" }} key={opinion._id}>
-                <List.Content floated="left">
-                  <List.Description>
-                    {opinion.isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
-                    {opinion.description}
-                  </List.Description>
-                </List.Content>
-                <List.Content floated="right">
-                  <Label>{opinion.votes}</Label>
-                </List.Content>
-              </List.Item>
-            );
-          })}
-        </List>
+      <Header pageTitle={"Summary"}></Header>
+      <Container style={{ width: "500px", padding: "20px 0px" }}>
+        {sortedGoodOpinions.map((opinion) => {
+          return (
+            <Grid key={opinion._id}>
+              <Grid.Row style={{ padding: "5px 0px 15px 0px" }} columns="2">
+                <Grid.Column width="13" floated="left" textAlign="left">
+                  {opinion.isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
+                  {opinion.description}
+                </Grid.Column>
+                <Grid.Column width="3" floated="right" textAlign="right">
+                  <Label color='teal'>{opinion.votes}</Label>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
+          );
+        })}
         <Divider />
         <List>
           {sortedBadOpinions.map((opinion) => {
             return (
-              <List.Item style={{ padding: "5px" }} key={opinion._id}>
-                <List.Content floated="left">
-                  <List.Description>
+              <Grid key={opinion._id}>
+                <Grid.Row style={{ padding: "5px 0px 15px 0px" }} columns="2">
+                  <Grid.Column width="13" floated="left" textAlign="left">
                     {opinion.isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
                     {opinion.description}
-                  </List.Description>
-                </List.Content>
-                <List.Content floated="right">
-                  <Label>{opinion.votes}</Label>
-                </List.Content>
-              </List.Item>
+                  </Grid.Column>
+                  <Grid.Column width="3" floated="right" textAlign="right">
+                    <Label color='teal'>{opinion.votes}</Label>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
             );
           })}
         </List>
       </Container>
+      <Footer style={{ paddingTop: "30px" }} />
     </div>
   );
 };

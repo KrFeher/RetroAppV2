@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 import { toast } from "react-toastify";
 import Footer from "./Footer";
+import Header from "./Header";
 
 const OpinionStep = (props) => {
   // States
@@ -112,11 +113,28 @@ const OpinionStep = (props) => {
 
   return (
     <React.Fragment>
-      <Container>
+      <Header pageTitle={"Your opinions"}></Header>
+      <Container style={{ width: "500px" }}>
         <Grid>
           <Grid.Column>
-            <Grid.Row style={{ paddingBottom: "10px" }}>
-              <Input label="Write an opinion : " onChange={onOpinionInputChange} error={inputError}></Input>
+            <Grid.Row style={{ padding: "20px 0px 30px 0px" }}>
+              <Input
+                onChange={onOpinionInputChange}
+                error={inputError}
+                label={
+                  <span
+                    style={{
+                      border: "2px solid",
+                      borderRadius: "15px 0px 0px 15px",
+                      borderColor: "#7761F1",
+                      padding: "8px",
+                    }}
+                  >
+                    Write your opinion:
+                  </span>
+                }
+                style={{ width: "100%" }}
+              ></Input>
             </Grid.Row>
             <Grid.Row style={{ paddingBottom: "10px" }}>
               {"Choose intention: "}
@@ -129,28 +147,29 @@ const OpinionStep = (props) => {
               ) : (
                 <Button circular icon="minus" size="tiny" style={{ marginLeft: "10px" }} color="red" onClick={onCurrentIconClick}></Button>
               )}
-              <Button floated="right" size="tiny" color="olive" onClick={addOpinion}>
+              <Button floated="right" icon size="tiny" color="teal" circular labelPosition="right" onClick={addOpinion}>
+                <Icon name="plus" />
                 Add opinion
               </Button>
             </Grid.Row>
             <Grid.Row></Grid.Row>
           </Grid.Column>
         </Grid>
-        <Divider />
+        <Divider horizontal section><Icon name="down arrow" /></Divider>
         <List>
           {opinions.map((opinion) => {
             return (
-              <List.Item style={{ padding: "5px" }} key={opinion._id}>
-                <List.Content floated="left">
-                  <List.Description>
+              <Grid key={opinion._id}>
+                <Grid.Row style={{ padding: '5px 0px 15px 0px' }} columns="2">
+                  <Grid.Column width='13' floated="left" textAlign='left'>
                     {opinion.isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
                     {opinion.description}
-                  </List.Description>
-                </List.Content>
-                <List.Content floated="right">
-                  <Button size="mini" icon="trash" circular onClick={() => deleteOpinion(opinion._id)}></Button>
-                </List.Content>
-              </List.Item>
+                  </Grid.Column>
+                  <Grid.Column width='3' floated="right" textAlign='right'>
+                    <Button color="red" inverted size="mini" icon="trash" circular size='medium' onClick={() => deleteOpinion(opinion._id)}></Button>
+                  </Grid.Column>
+                </Grid.Row>
+              </Grid>
             );
           })}
         </List>
