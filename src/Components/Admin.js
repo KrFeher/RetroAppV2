@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Input, Divider, Card, Grid, Loader, Popup, Label, Icon } from "semantic-ui-react";
+import { Container, Input, Divider, Card, Grid, Loader, Popup, Label } from "semantic-ui-react";
 import api from "../api";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
@@ -29,7 +29,7 @@ const Admin = () => {
 
   const addRetro = async () => {
     setIsWaitingForResponse(true);
-    if (newRetroName) {
+    if (newRetroName && !inputError) {
       if (!retros.find((retro) => retro._id === newRetroName)) {
         const result = await api.addRetro(newRetroName);
         if (!result) {
@@ -43,7 +43,7 @@ const Admin = () => {
         setInputError(true);
       }
     } else {
-      toast("Please enter something to the retro name.", { type: "warning" });
+      toast("Make sure retro name is valid", { type: "warning" });
       setInputError(true);
     }
     setIsWaitingForResponse(false);
@@ -67,13 +67,22 @@ const Admin = () => {
   };
 
   const onRetroNameChange = (event) => {
-    const trimmedRetroName = event.target.value.trim();
-    if (retros.find((retro) => retro._id === trimmedRetroName)) {
+    const retroName = event.target.value;
+    setInputError(false);
+
+    if (retroName.length > 20) {
       setInputError(true);
-    } else {
-      if (inputError) setInputError(false);
     }
-    setNewRetroName(trimmedRetroName);
+
+    if (retros.find((retro) => retro._id === retroName)) {
+      setInputError(true);
+    }
+
+    if (retroName.includes("/") || retroName.includes("?")) {
+      setInputError(true);
+    }
+
+    setNewRetroName(retroName);
   };
 
   return (
@@ -103,9 +112,17 @@ const Admin = () => {
                   </span>
                 }
                 labelPosition="right"
-                style={{ width: "100%" }}
+                fluid
               ></Input>
             </Grid.Column>
+          </Grid.Row>
+          <Grid.Row style={{ paddingLeft: "20px", paddingTop: "0px", color: "grey" }}>
+            {
+              <span>
+                <div>{"* not allowed characters: / and ?"}</div>
+                <div>{"* maximum character length: 20"}</div>
+              </span>
+            }
           </Grid.Row>
         </Grid>
 
