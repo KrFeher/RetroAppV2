@@ -35,7 +35,7 @@ function App() {
           <Route path="/admin">{authenticated ? <Admin /> : <LoginPage />}</Route>
         </Switch>
       </Router>
-      <ToastContainer position="bottom-center" />
+      <ToastContainer position="top-center" />
     </div>
   );
 }
