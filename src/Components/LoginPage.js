@@ -60,7 +60,7 @@ function LoginPage() {
         {isLoading ? (
           <Placeholder style={{ marginTop: "50px" }}>
             {[...Array(8)].map((e, i) => (
-              <Placeholder.Line />
+              <Placeholder.Line key={i} />
             ))}
           </Placeholder>
         ) : (
@@ -72,11 +72,12 @@ function LoginPage() {
               <Router>
                 {retros.map((retro) => {
                   return (
-                    <Grid.Column style={{ padding: "10px 14px 0px 0px" }}>
+                    <Grid.Column key={retro._id} style={{ padding: "10px 14px 0px 0px" }}>
                       <Popup
                         mouseEnterDelay={1000}
+                        content={retro._id}
                         trigger={
-                          <Card key={retro._id} onClick={() => history.push(`/retro?_id=${retro._id}`)}>
+                          <Card onClick={() => history.push(`/retro?_id=${retro._id}`)}>
                             <Card.Content
                               textAlign="center"
                               style={{
@@ -94,7 +95,6 @@ function LoginPage() {
                             </Card.Content>
                           </Card>
                         }
-                        content={retro._id}
                       ></Popup>
                     </Grid.Column>
                   );

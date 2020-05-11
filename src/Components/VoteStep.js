@@ -91,35 +91,33 @@ export const VoteStep = (props) => {
     <div>
       <Header pageTitle={"Vote on opinions"}></Header>
       <Container style={{ width: "500px", padding: "20px 0px" }}>
-        {Object.entries(opinionsWithVotes).map((opinion) => {
-          return (
-            <Grid key={opinion._id}>
-              <Grid.Row style={{ padding: "5px 0px 15px 0px" }} columns="2">
-                <Grid.Column width="13" floated="left" textAlign="left">
-                  {opinion[1].isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
-                  {opinion[1].description}
-                </Grid.Column>
-                <Grid.Column width="3" floated="right" textAlign="right">
-                  <Button
-                    size="medium"
-                    icon="up arrow"
-                    color={opinionsWithVotes[opinion[0]].upVoted ? "green" : "grey"}
-                    circular
-                    onClick={() => voteUpOpinion(opinion[0])}
-                  ></Button>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-          );
-        })}
+        {Object.entries(opinionsWithVotes).map((opinion) => (
+          <Grid key={opinion._id}>
+            <Grid.Row style={{ padding: "5px 0px 15px 0px" }} columns="2">
+              <Grid.Column width="13" floated="left" textAlign="left">
+                {opinion[1].isPositive ? <Icon name="plus" color="green" /> : <Icon name="minus" color="red" />}
+                {opinion[1].description}
+              </Grid.Column>
+              <Grid.Column width="3" floated="right" textAlign="right">
+                <Button
+                  size="medium"
+                  icon="up arrow"
+                  color={opinionsWithVotes[opinion[0]].upVoted ? "green" : "grey"}
+                  circular
+                  onClick={() => voteUpOpinion(opinion[0])}
+                ></Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        ))}
       </Container>
       <Footer style={{ paddingTop: "30px" }}>
         <Grid>
           <Grid.Row columns="2">
             <Grid.Column>
-                <Button floated="left" circular size="small" color="teal" onClick={fetchOpinions} icon name="refresh" loading={isWaitingForResponse}>
-                  <Popup trigger={<Icon name="refresh" />} content="Manually refresh opinions"></Popup>
-                </Button>
+              <Button floated="left" circular size="small" color="teal" onClick={fetchOpinions} icon name="refresh" loading={isWaitingForResponse}>
+                <Popup trigger={<Icon name="refresh" />} content="Manually refresh opinions"></Popup>
+              </Button>
             </Grid.Column>
             <Grid.Column>
               <Button

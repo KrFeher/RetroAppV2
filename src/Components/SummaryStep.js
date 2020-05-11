@@ -11,7 +11,6 @@ const SummaryStep = (props) => {
   const [sortedGoodOpinions, setSortedGoodOpinions] = useState([]);
   const [sortedBadOpinions, setSortedBadOpinions] = useState([]);
   const [retroId, setRetroId] = useState(queryString.parse(useLocation().search)._id);
-  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
 
   let retro = useSelector((state) => state.find((retro) => retro._id === retroId));
 
@@ -24,9 +23,7 @@ const SummaryStep = (props) => {
   }, [retro]);
 
   const fetchVotedOpinions = async () => {
-    setIsWaitingForResponse(true);
     const { opinions } = await api.getRetro(retroId);
-    setIsWaitingForResponse(false);
     setOpinionsSorted(opinions);
   };
 

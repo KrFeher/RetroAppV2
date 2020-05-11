@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
@@ -11,7 +11,6 @@ import api from "./api";
 import actions from "./actions";
 
 function App() {
-  const [authenticated, setAuthenticated] = useState(true);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -32,7 +31,7 @@ function App() {
           <Route path="/retro">
             <Retro />
           </Route>
-          <Route path="/admin">{authenticated ? <Admin /> : <LoginPage />}</Route>
+          <Route path="/admin">{<Admin />}</Route>
         </Switch>
       </Router>
       <ToastContainer position="top-center" />

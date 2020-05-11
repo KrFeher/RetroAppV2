@@ -9,7 +9,6 @@ import Footer from "./Footer";
 import Header from "./Header";
 
 const OpinionStep = (props) => {
-  // States
   let location = useLocation();
   const retroId = queryString.parse(location.search);
 
@@ -39,6 +38,7 @@ const OpinionStep = (props) => {
     async function fetchData() {
       const response = await api.getRetro(retroId._id);
       setCurrentRetro(response);
+      // todo: implement check if retro is valid, in case they go directly to page.
     }
     fetchData();
   }, []);
@@ -166,7 +166,7 @@ const OpinionStep = (props) => {
                     {opinion.description}
                   </Grid.Column>
                   <Grid.Column width='3' floated="right" textAlign='right'>
-                    <Button color="red" inverted size="mini" icon="trash" circular size='medium' onClick={() => deleteOpinion(opinion._id)}></Button>
+                    <Button color="red" inverted size="medium" icon="trash" circular onClick={() => deleteOpinion(opinion._id)}></Button>
                   </Grid.Column>
                 </Grid.Row>
               </Grid>
