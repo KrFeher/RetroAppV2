@@ -79,6 +79,7 @@ const Admin = () => {
     }
 
     if (retroName.includes("/") || retroName.includes("?")) {
+      // we're using them in URL and it messes up navigation.
       setInputError(true);
     }
 
@@ -141,12 +142,12 @@ const Admin = () => {
           <Grid.Row columns={3}>
             {retros.map((retro) => {
               return (
-                <Grid.Column style={{ padding: "10px 14px 0px 0px" }}>
+                <Grid.Column key={retro._id} style={{ padding: "10px 14px 0px 0px" }}>
                   <Popup
                     mouseEnterDelay={1000}
                     trigger={
                       <div>
-                        <Card key={retro._id} onClick={() => history.push(`/retro?_id=${retro._id}`)}>
+                        <Card onClick={() => history.push(`/retro?_id=${retro._id}`)}>
                           <Card.Content
                             textAlign="center"
                             style={{
