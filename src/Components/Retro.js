@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { Breadcrumb, Container, Divider, Grid } from "semantic-ui-react";
+import React, { useState } from "react";
 import OpinionStep from "./OpinionStep";
 import VoteStep from "./VoteStep";
 import SummaryStep from "./SummaryStep";

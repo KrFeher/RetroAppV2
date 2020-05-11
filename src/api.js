@@ -7,16 +7,15 @@ const api = {
   startRealTimeUpdate(callbackFunction) {
     if (!isRealTimeUpdateRunning) {
       events.onmessage = (event) => {
-        const parsedData = JSON.parse(event.data);
-        callbackFunction(parsedData);
+        try { // initial connection message isn't JSON
+          const parsedData = JSON.parse(event.data);
+          callbackFunction(parsedData);
+        } catch (error) {
+          console.log('Invalid JSON data received.')
+        }
       };
       isRealTimeUpdateRunning = true;
     }
-  },
-
-  stopRealTimeUpdate() {
-    events.close();
-    isRealTimeUpdateRunning = false;
   },
 
   async getRetros() {
